@@ -1,11 +1,9 @@
-# Opo Dev TODO
+# TODO
 
-## Quality & Launch (from TASK_LIST.md)
-- [x] Run manual QA + Lighthouse performance audit
-- [x] Conduct accessibility checks and error handling validation
-- [x] Document final release and project hand-off notes
+- [x] Implement Tailwind + base shadcn-like primitives scaffold in frontend
+- [ ] Create remaining shadcn-like UI primitives under `frontend/src/components/ui/`
 
-## Current work
-- [x] Disable login/signup routes in the frontend (temporarily)
-
+- [ ] Migrate auth components (Login/PinLogin/PinAuthModal) to shadcn Button/Input/Card styles
+- [ ] Migrate Navigation component to shadcn layout components
+- [ ] Ensure build/lint/tests pass
 
