@@ -1,8 +1,7 @@
-// src/components/Login.jsx
 import React, { useState } from "react";
 import axios from "axios";
 
-const Login = ({ onSuccess }) => {
+const Signup = ({ onSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -11,18 +10,17 @@ const Login = ({ onSuccess }) => {
     e.preventDefault();
     setError("");
     try {
-      const resp = await axios.post("/auth/login", { email, password });
-      // Store JWT in localStorage (or HttpOnly cookie via backend)
+      const resp = await axios.post("/auth/signup", { email, password });
       localStorage.setItem("token", resp.data.access_token);
-      onSuccess();
+      onSuccess?.();
     } catch (err) {
-      setError(err.response?.data?.detail || "Login failed");
+      setError(err.response?.data?.detail || "Signup failed");
     }
   };
 
   return (
     <div className="glass-card max-w-sm mx-auto mt-20 p-6">
-      <h2 className="text-2xl font-bold mb-4 text-center">Sign In</h2>
+      <h2 className="text-2xl font-bold mb-4 text-center">Create Account</h2>
       {error && <p className="text-red-500 mb-2 text-center">{error}</p>}
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
@@ -42,19 +40,12 @@ const Login = ({ onSuccess }) => {
           className="input"
         />
         <button type="submit" className="btn-primary">
-          Login
+          Sign Up
         </button>
-
-        <div className="text-center mt-2 text-sm">
-          <span>New here? </span>
-          <a href="/signup" className="text-blue-400 hover:underline">
-            Create an account
-          </a>
-        </div>
       </form>
     </div>
   );
 };
 
-export default Login;
+export default Signup;
 

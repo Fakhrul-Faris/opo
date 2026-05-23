@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+
 import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import Login from './components/Login';
+import Signup from './components/Signup';
+
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import CampaignManager from './pages/CampaignManager';
@@ -18,19 +21,24 @@ import Navigation from './components/Navigation';
 // A wrapper to handle the inactivity timer
 const AppLayout = ({ children }) => {
   const [isLocked, setIsLocked] = useState(false);
-  let timeoutId;
+  const [timeoutId, setTimeoutId] = useState(null);
 
   const resetTimer = () => {
     if (isLocked) return;
-    clearTimeout(timeoutId);
+
+    if (timeoutId) clearTimeout(timeoutId);
+
     // 5 minutes of inactivity locks the session
-    timeoutId = setTimeout(() => {
+    const id = setTimeout(() => {
       const token = localStorage.getItem("token");
       if (token) {
         setIsLocked(true);
       }
-    }, 5 * 60 * 1000); 
+    }, 5 * 60 * 1000);
+
+    setTimeoutId(id);
   };
+
 
   useEffect(() => {
     window.addEventListener('mousemove', resetTimer);
@@ -71,6 +79,9 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={<LoginWrapper />} />
+        <Route path="/signup" element={<Signup onSuccess={() => {}} />} />
+        
+
         
         {/* Protected Routes wrapped in AppLayout */}
         <Route

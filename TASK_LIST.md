@@ -46,9 +46,11 @@
 ## Quality & Launch
 - [x] Write automated tests for backend (`pytest`)
 - [x] Write automated tests for frontend (`Vitest` / `React Testing Library`)
-- [ ] Perform manual QA and Lighthouse performance audit
-- [ ] Conduct accessibility checks and error handling validation
-- [ ] Document final release and project hand-off notes
+- [x] Perform manual QA and Lighthouse performance audit
+- [x] Conduct accessibility checks and error handling validation
+- [x] Document final release and project hand-off notes
+
+
 
 ## Notes
 - Backend currently has auth, settings, campaigns, content, referrals, and AI routers.
