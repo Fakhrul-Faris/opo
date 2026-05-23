@@ -9,6 +9,8 @@ const Navigation = () => {
     { path: "/campaigns", label: "Campaign Manager" },
     { path: "/content", label: "Content Bank" },
     { path: "/referrals", label: "Referral Tracker" },
+    { path: "/calendar", label: "Calendar" },
+    { path: "/generator", label: "Content Generator" },
     { path: "/ai", label: "AI Hub" },
     { path: "/settings", label: "Settings" }
   ];

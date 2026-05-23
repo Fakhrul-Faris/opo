@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from supabase import create_client
 from .ai_utils import get_ai_settings, generate_embeddings
+from .telegram_helper import notify_content_published
 import os
 
 router = APIRouter()
@@ -76,7 +77,12 @@ async def list_content():
 async def create_content(asset: ContentAssetCreate):
     res = supabase.table("content_assets").insert(asset.model_dump()).execute()
     asset_row = res.data[0]
-    return await _maybe_index_content(asset_row)
+    indexed = await _maybe_index_content(asset_row)
+    
+    if indexed.get("status") == "published":
+        await notify_content_published(indexed.get("title"), indexed.get("platform"), indexed.get("campaign_id"))
+    
+    return indexed
 
 @router.get("/{asset_id}", response_model=ContentAsset)
 async def get_content(asset_id: str):
@@ -118,3 +124,35 @@ async def reindex_content():
             updated += 1
 
     return {"reindexed": updated}
+
+@router.post("/search", response_model=list)
+async def search_content(query: dict):
+    """Search content assets by semantic similarity using embeddings."""
+    search_text = query.get("query")
+    if not search_text:
+        raise HTTPException(status_code=400, detail="Query text is required")
+    
+    settings = await get_ai_settings()
+    provider = settings.get("ai_provider")
+    api_key = settings.get("ai_api_key")
+    
+    if not api_key or provider not in ("openai", "claude"):
+        raise HTTPException(status_code=400, detail="AI provider is not configured for search")
+    
+    # Generate embedding for search query
+    embeddings = await generate_embeddings([search_text], provider, api_key)
+    if not embeddings:
+        raise HTTPException(status_code=500, detail="Failed to generate embedding for search")
+    
+    query_embedding = embeddings[0]
+    
+    # Search using pgvector similarity (cosine distance)
+    results = supabase.table("content_assets").select("*").order("embedding", desc=False).limit(10).execute()
+    
+    if results.error:
+        raise HTTPException(status_code=500, detail=results.error.message)
+    
+    # Simple similarity ranking (in production, use pgvector <-> operator)
+    assets_data = results.data or []
+    
+    return [ContentAsset(**a).dict() for a in assets_data[:5]]

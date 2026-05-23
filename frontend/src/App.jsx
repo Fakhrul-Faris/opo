@@ -7,6 +7,8 @@ import CampaignManager from './pages/CampaignManager';
 import ContentBank from './pages/ContentBank';
 import ReferralTracker from './pages/ReferralTracker';
 import AIHub from './pages/AIHub';
+import Calendar from './pages/Calendar';
+import ContentGenerator from './pages/ContentGenerator';
 import ProtectedRoute from './components/ProtectedRoute';
 import PinAuthModal from './components/PinAuthModal';
 import Navigation from './components/Navigation';
@@ -120,6 +122,22 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <AIHub />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/calendar" 
+                  element={
+                    <ProtectedRoute>
+                      <Calendar />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/generator" 
+                  element={
+                    <ProtectedRoute>
+                      <ContentGenerator />
                     </ProtectedRoute>
                   } 
                 />

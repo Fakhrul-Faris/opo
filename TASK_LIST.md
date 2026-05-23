@@ -38,15 +38,13 @@
   - [ ] Calendar / planning view
   - [ ] Content generators
   - [ ] AI agents hub
-- [ ] Integrate Claude Sonnet / AI provider via `/ai/execute`
-- [ ] Add Telegram notification helper
-- [ ] Add provider-aware AI execution logic
+- [x] Add Telegram notification helper
 - [ ] Implement semantic search / vector retrieval
 - [ ] Add compliance and community intelligence modules
 
 ## Quality & Launch
-- [ ] Write automated tests for backend (`pytest`)
-- [ ] Write automated tests for frontend (`Jest` / `React Testing Library`)
+- [x] Write automated tests for backend (`pytest`)
+- [x] Write automated tests for frontend (`Vitest` / `React Testing Library`)
 - [ ] Perform manual QA and Lighthouse performance audit
 - [ ] Conduct accessibility checks and error handling validation
 - [ ] Document final release and project hand-off notes

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
 load_dotenv()
-from routers import campaigns, content, referrals, auth, settings, ai
+from routers import campaigns, content, referrals, auth, settings, ai, compliance
 
 app = FastAPI(title="Opo Marketing Portal Backend")
 
@@ -12,6 +12,7 @@ app.include_router(referrals.router, prefix="/referrals", tags=["Referral Tracke
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(settings.router, prefix="/settings", tags=["Settings"])
 app.include_router(ai.router, prefix="/ai", tags=["AI"])
+app.include_router(compliance.router, prefix="/compliance", tags=["Compliance"])
 
 # Health‑check endpoint
 @app.get("/health", tags=["Health"])
