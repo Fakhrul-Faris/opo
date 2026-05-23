@@ -1,0 +1,17 @@
+[project]
+name = "opo_backend"
+version = "0.1.0"
+description = "FastAPI backend for Opo portal"
+authors = [{name = "Fakhrul", email = "fakhrul@example.com"}]
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "supabase-py",
+    "pgvector",
+    "pydantic",
+    "python-dotenv"
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
