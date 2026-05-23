@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.python-version
+.venv/
+venv/
+backend/.venv/
+backend/__pycache__/
+backend/*.pyc
+backend/.python-version
+
+# Supabase / environment
+*.env
+backend/.env
+
+# Node
+node_modules/
+frontend/dist/
+
+# Build / packaging artifacts
+*.egg-info/
+.eggs/
+*.egg
+
+# System files
+.DS_Store
+.env.local
+.env.*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

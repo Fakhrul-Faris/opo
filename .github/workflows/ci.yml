@@ -1,0 +1,53 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install supabase-py python-dotenv uvicorn pytest ruff httpx
+
+      - name: Lint with ruff
+        run: |
+          ruff check .
+
+      - name: Run tests
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE: ${{ secrets.SUPABASE_SERVICE_ROLE }}
+        run: |
+          pytest -q
+
+      - name: Build Docker image
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}:latest .
+
+      - name: Deploy to Railway
+        if: github.ref == 'refs/heads/main'
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          curl -L https://github.com/railwayapp/cli/releases/download/v2.2.5/railway-macos-arm64.tar.gz | tar xz
+          ./railway up --service backend --token $RAILWAY_TOKEN

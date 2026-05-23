@@ -1,122 +1,135 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
+import Login from './components/Login';
+import Dashboard from './pages/Dashboard';
+import Settings from './pages/Settings';
+import CampaignManager from './pages/CampaignManager';
+import ContentBank from './pages/ContentBank';
+import ReferralTracker from './pages/ReferralTracker';
+import AIHub from './pages/AIHub';
+import ProtectedRoute from './components/ProtectedRoute';
+import PinAuthModal from './components/PinAuthModal';
+import Navigation from './components/Navigation';
 
-function App() {
-  const [count, setCount] = useState(0)
+// A wrapper to handle the inactivity timer
+const AppLayout = ({ children }) => {
+  const [isLocked, setIsLocked] = useState(false);
+  let timeoutId;
+
+  const resetTimer = () => {
+    if (isLocked) return;
+    clearTimeout(timeoutId);
+    // 5 minutes of inactivity locks the session
+    timeoutId = setTimeout(() => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        setIsLocked(true);
+      }
+    }, 5 * 60 * 1000); 
+  };
+
+  useEffect(() => {
+    window.addEventListener('mousemove', resetTimer);
+    window.addEventListener('keydown', resetTimer);
+    window.addEventListener('scroll', resetTimer);
+    window.addEventListener('click', resetTimer);
+
+    resetTimer();
+
+    return () => {
+      window.removeEventListener('mousemove', resetTimer);
+      window.removeEventListener('keydown', resetTimer);
+      window.removeEventListener('scroll', resetTimer);
+      window.removeEventListener('click', resetTimer);
+      clearTimeout(timeoutId);
+    };
+  }, [isLocked]);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div style={{ display: 'flex' }}>
+      <Navigation />
+      <main style={{ marginLeft: '18rem', padding: '2rem', width: '100%' }}>
+        {children}
+      </main>
+      {isLocked && <PinAuthModal onVerify={() => setIsLocked(false)} />}
+    </div>
+  );
+};
 
-      <div className="ticks"></div>
+// Login Route Wrapper so we can use navigate
+const LoginWrapper = () => {
+  const navigate = useNavigate();
+  return <Login onSuccess={() => navigate('/dashboard')} />;
+};
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/login" element={<LoginWrapper />} />
+        
+        {/* Protected Routes wrapped in AppLayout */}
+        <Route
+          path="/*"
+          element={
+            <AppLayout>
+              <Routes>
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route 
+                  path="/dashboard" 
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/campaigns" 
+                  element={
+                    <ProtectedRoute>
+                      <CampaignManager />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/content" 
+                  element={
+                    <ProtectedRoute>
+                      <ContentBank />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/referrals" 
+                  element={
+                    <ProtectedRoute>
+                      <ReferralTracker />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/settings" 
+                  element={
+                    <ProtectedRoute>
+                      <Settings />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/ai" 
+                  element={
+                    <ProtectedRoute>
+                      <AIHub />
+                    </ProtectedRoute>
+                  } 
+                />
+              </Routes>
+            </AppLayout>
+          }
+        />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;

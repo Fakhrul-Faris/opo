@@ -9,7 +9,8 @@ dependencies = [
     "supabase-py",
     "pgvector",
     "pydantic",
-    "python-dotenv"
+    "python-dotenv",
+    "httpx"
 ]
 
 [build-system]
