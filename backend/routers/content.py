@@ -7,10 +7,10 @@ import os
 
 router = APIRouter()
 
-supabase = create_client(
-    os.getenv("SUPABASE_URL"),
-    os.getenv("SUPABASE_SERVICE_ROLE")
-)
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_SERVICE_ROLE = os.getenv("SUPABASE_SERVICE_ROLE")
+
+supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE) if SUPABASE_URL and SUPABASE_SERVICE_ROLE else None
 
 class ContentAssetBase(BaseModel):
     title: str
@@ -104,8 +104,8 @@ async def delete_content(asset_id: str):
 @router.post("/reindex", response_model=dict)
 async def reindex_content():
     assets_data = supabase.table("content_assets").select("*").execute()
-    if assets_data.error:
-        raise HTTPException(status_code=500, detail=assets_data.error.message)
+    if assets_data.data is None:
+        raise HTTPException(status_code=500, detail="Unable to load content assets for reindex")
 
     settings = await get_ai_settings()
     provider = settings.get("ai_provider")
@@ -149,8 +149,8 @@ async def search_content(query: dict):
     # Search using pgvector similarity (cosine distance)
     results = supabase.table("content_assets").select("*").order("embedding", desc=False).limit(10).execute()
     
-    if results.error:
-        raise HTTPException(status_code=500, detail=results.error.message)
+    if results.data is None:
+        raise HTTPException(status_code=500, detail="Unable to search content")
     
     # Simple similarity ranking (in production, use pgvector <-> operator)
     assets_data = results.data or []

@@ -10,10 +10,7 @@ load_dotenv()
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SERVICE_ROLE = os.getenv("SUPABASE_SERVICE_ROLE")
 
-if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE:
-    raise RuntimeError("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE environment variables")
-
-supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE)
+supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE) if SUPABASE_URL and SUPABASE_SERVICE_ROLE else None
 
 DEFAULT_OPENAI_MODEL = "gpt-4o-mini"
 DEFAULT_OPENAI_EMBEDDING_MODEL = "text-embedding-3-small"
@@ -21,12 +18,13 @@ DEFAULT_CLAUDE_MODEL = "claude-3.5-neo"
 DEFAULT_CLAUDE_EMBEDDING_MODEL = "claude-3.5-embedding"
 
 async def get_ai_settings() -> dict:
+    if supabase is None:
+        return {"ai_provider": "claude", "ai_api_key": os.getenv("AI_API_KEY", "")}
+
     result = supabase.table("app_settings").select("*").eq("id", 1).maybe_single().execute()
-    if result.error:
-        raise RuntimeError("Unable to load AI settings from Supabase")
-    if result.data:
-        return result.data
-    return {"ai_provider": "claude", "ai_api_key": os.getenv("AI_API_KEY", "")}
+    if result is None or result.data is None:
+        return {"ai_provider": "claude", "ai_api_key": os.getenv("AI_API_KEY", "")}
+    return result.data or {"ai_provider": "claude", "ai_api_key": os.getenv("AI_API_KEY", "")}
 
 async def generate_text_completion(
     prompt: str,

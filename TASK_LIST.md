@@ -34,13 +34,14 @@
 - [x] Implement backend endpoints for each module (CRUD, vector upserts, AI calls)
 
 ## Phase 2 & 3 — Advanced Features
-- [ ] Build UI modules for Phase 2 & 3
-  - [ ] Calendar / planning view
-  - [ ] Content generators
-  - [ ] AI agents hub
+- [x] Build UI modules for Phase 2 & 3
+  - [x] Calendar / planning view
+  - [x] Content generators
+  - [x] AI agents hub
 - [x] Add Telegram notification helper
-- [ ] Implement semantic search / vector retrieval
-- [ ] Add compliance and community intelligence modules
+- [x] Implement semantic search / vector retrieval endpoints
+- [x] Add compliance tracking module
+- [x] Add community intelligence module (ketua_arisan management)
 
 ## Quality & Launch
 - [x] Write automated tests for backend (`pytest`)

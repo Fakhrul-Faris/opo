@@ -11,6 +11,8 @@ const Navigation = () => {
     { path: "/referrals", label: "Referral Tracker" },
     { path: "/calendar", label: "Calendar" },
     { path: "/generator", label: "Content Generator" },
+    { path: "/agents", label: "AI Agents" },
+    { path: "/community", label: "Community Intelligence" },
     { path: "/ai", label: "AI Hub" },
     { path: "/settings", label: "Settings" }
   ];

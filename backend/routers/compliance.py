@@ -36,23 +36,23 @@ async def list_compliance_checks(campaign_id: str | None = None):
         query = query.eq("campaign_id", campaign_id)
     
     res = query.execute()
-    if res.error:
-        raise HTTPException(status_code=500, detail=res.error.message)
+    if res.data is None:
+        raise HTTPException(status_code=500, detail="Unable to load compliance checks")
     
     return [ComplianceCheck(**c).dict() for c in res.data or []]
 
 @router.post("", response_model=ComplianceCheck)
 async def create_compliance_check(check: ComplianceCheckCreate):
     res = supabase.table("compliance_checks").insert(check.dict()).execute()
-    if res.error:
-        raise HTTPException(status_code=400, detail=res.error.message)
+    if res.data is None:
+        raise HTTPException(status_code=400, detail="Unable to create compliance check")
     
     return ComplianceCheck(**res.data[0]).dict()
 
 @router.get("/{check_id}", response_model=ComplianceCheck)
 async def get_compliance_check(check_id: str):
     res = supabase.table("compliance_checks").select("*").eq("id", check_id).single().execute()
-    if res.error:
+    if res.data is None:
         raise HTTPException(status_code=404, detail="Check not found")
     
     return ComplianceCheck(**res.data).dict()
@@ -60,8 +60,8 @@ async def get_compliance_check(check_id: str):
 @router.put("/{check_id}", response_model=ComplianceCheck)
 async def update_compliance_check(check_id: str, check: ComplianceCheckCreate):
     res = supabase.table("compliance_checks").update(check.dict()).eq("id", check_id).execute()
-    if res.error:
-        raise HTTPException(status_code=400, detail=res.error.message)
+    if res.data is None:
+        raise HTTPException(status_code=400, detail="Unable to update compliance check")
     
     return ComplianceCheck(**res.data[0]).dict()
 
@@ -77,8 +77,8 @@ async def approve_compliance_check(check_id: str, reviewer: dict):
         "checked_at": "now()"
     }).eq("id", check_id).execute()
     
-    if res.error:
-        raise HTTPException(status_code=400, detail=res.error.message)
+    if res.data is None:
+        raise HTTPException(status_code=400, detail="Unable to approve compliance check")
     
     return {"status": "approved"}
 
@@ -91,7 +91,7 @@ async def reject_compliance_check(check_id: str, review: dict):
         "checked_at": "now()"
     }).eq("id", check_id).execute()
     
-    if res.error:
-        raise HTTPException(status_code=400, detail=res.error.message)
+    if res.data is None:
+        raise HTTPException(status_code=400, detail="Unable to reject compliance check")
     
     return {"status": "rejected"}

@@ -81,13 +81,15 @@ const AIHub = () => {
           </div>
           <div>
             <label className="block text-muted mb-2">Override Provider</label>
-            <input
-              type="text"
-              placeholder="openai or claude"
+            <select
               value={provider}
               onChange={(e) => setProvider(e.target.value)}
               className="input"
-            />
+            >
+              <option value="">Use configured provider</option>
+              <option value="openai">OpenAI</option>
+              <option value="claude">Anthropic Claude</option>
+            </select>
           </div>
         </div>
         <div className="grid gap-4 md:grid-cols-2">

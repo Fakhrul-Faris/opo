@@ -9,6 +9,8 @@ import ReferralTracker from './pages/ReferralTracker';
 import AIHub from './pages/AIHub';
 import Calendar from './pages/Calendar';
 import ContentGenerator from './pages/ContentGenerator';
+import AIAgentsHub from './pages/AIAgentsHub';
+import CommunityIntelligence from './pages/CommunityIntelligence';
 import ProtectedRoute from './components/ProtectedRoute';
 import PinAuthModal from './components/PinAuthModal';
 import Navigation from './components/Navigation';
@@ -77,69 +79,85 @@ function App() {
             <AppLayout>
               <Routes>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                <Route 
-                  path="/dashboard" 
+                <Route
+                  path="/dashboard"
                   element={
                     <ProtectedRoute>
                       <Dashboard />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/campaigns" 
+                <Route
+                  path="/campaigns"
                   element={
                     <ProtectedRoute>
                       <CampaignManager />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/content" 
+                <Route
+                  path="/content"
                   element={
                     <ProtectedRoute>
                       <ContentBank />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/referrals" 
+                <Route
+                  path="/referrals"
                   element={
                     <ProtectedRoute>
                       <ReferralTracker />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/settings" 
-                  element={
-                    <ProtectedRoute>
-                      <Settings />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/ai" 
-                  element={
-                    <ProtectedRoute>
-                      <AIHub />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/calendar" 
+                <Route
+                  path="/calendar"
                   element={
                     <ProtectedRoute>
                       <Calendar />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/generator" 
+                <Route
+                  path="/generator"
                   element={
                     <ProtectedRoute>
                       <ContentGenerator />
                     </ProtectedRoute>
-                  } 
+                  }
+                />
+                <Route
+                  path="/agents"
+                  element={
+                    <ProtectedRoute>
+                      <AIAgentsHub />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/community"
+                  element={
+                    <ProtectedRoute>
+                      <CommunityIntelligence />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/ai"
+                  element={
+                    <ProtectedRoute>
+                      <AIHub />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute>
+                      <Settings />
+                    </ProtectedRoute>
+                  }
                 />
               </Routes>
             </AppLayout>

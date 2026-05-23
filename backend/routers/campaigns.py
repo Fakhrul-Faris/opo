@@ -7,10 +7,10 @@ import os
 
 router = APIRouter()
 
-supabase = create_client(
-    os.getenv("SUPABASE_URL"),
-    os.getenv("SUPABASE_SERVICE_ROLE")
-)
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_SERVICE_ROLE = os.getenv("SUPABASE_SERVICE_ROLE")
+
+supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE) if SUPABASE_URL and SUPABASE_SERVICE_ROLE else None
 
 class CampaignBase(BaseModel):
     name: str = Field(..., example="Q1 Launch")
@@ -73,14 +73,16 @@ async def _maybe_index_campaign(campaign: dict) -> dict:
 
 @router.get("/", response_model=list[Campaign])
 async def list_campaigns():
+    if supabase is None:
+        return []
     data = supabase.table("campaigns").select("*").execute()
-    return data.data
+    return data.data or []
 
 @router.post("/", response_model=Campaign, status_code=201)
 async def create_campaign(campaign: CampaignCreate):
     res = supabase.table("campaigns").insert(campaign.dict()).execute()
-    if res.error:
-        raise HTTPException(status_code=400, detail=res.error.message)
+    if res.data is None:
+        raise HTTPException(status_code=400, detail="Unable to create campaign")
 
     campaign_row = res.data[0]
     indexed = await _maybe_index_campaign(campaign_row)
@@ -91,7 +93,7 @@ async def create_campaign(campaign: CampaignCreate):
 @router.get("/{campaign_id}", response_model=Campaign)
 async def get_campaign(campaign_id: str):
     res = supabase.table("campaigns").select("*").eq("id", campaign_id).single().execute()
-    if res.error:
+    if res.data is None:
         raise HTTPException(status_code=404, detail="Campaign not found")
     return res.data
 
@@ -103,8 +105,8 @@ async def update_campaign(campaign_id: str, upd: CampaignCreate):
     old_name = old_data.get("name")
     
     res = supabase.table("campaigns").update(upd.dict()).eq("id", campaign_id).execute()
-    if res.error:
-        raise HTTPException(status_code=400, detail=res.error.message)
+    if res.data is None:
+        raise HTTPException(status_code=400, detail="Unable to update campaign")
 
     campaign_row = res.data[0]
     indexed = await _maybe_index_campaign(campaign_row)
@@ -119,15 +121,15 @@ async def update_campaign(campaign_id: str, upd: CampaignCreate):
 @router.delete("/{campaign_id}", status_code=204)
 async def delete_campaign(campaign_id: str):
     res = supabase.table("campaigns").delete().eq("id", campaign_id).execute()
-    if res.error:
-        raise HTTPException(status_code=400, detail=res.error.message)
+    if res.data is None:
+        raise HTTPException(status_code=400, detail="Unable to delete campaign")
     return
 
 @router.post("/reindex", response_model=dict)
 async def reindex_campaigns():
     campaigns_data = supabase.table("campaigns").select("*").execute()
-    if campaigns_data.error:
-        raise HTTPException(status_code=500, detail=campaigns_data.error.message)
+    if campaigns_data.data is None:
+        raise HTTPException(status_code=500, detail="Unable to load campaigns for reindex")
 
     settings = await get_ai_settings()
     provider = settings.get("ai_provider")
@@ -173,8 +175,8 @@ async def search_campaigns(query: dict):
     # Search using pgvector similarity (cosine distance)
     results = supabase.table("campaigns").select("*").order("embedding", desc=False).limit(10).execute()
     
-    if results.error:
-        raise HTTPException(status_code=500, detail=results.error.message)
+    if results.data is None:
+        raise HTTPException(status_code=500, detail="Unable to search campaigns")
     
     # Simple similarity ranking (in production, use pgvector <-> operator)
     campaigns_data = results.data or []

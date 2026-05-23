@@ -50,8 +50,9 @@ const Settings = () => {
         <h2 className="text-2xl font-bold mb-4">Settings</h2>
         <form onSubmit={handleSave} className="flex flex-col gap-4">
           <div>
-            <label className="block text-muted mb-2">AI Provider</label>
+            <label htmlFor="provider-select" className="block text-muted mb-2">AI Provider</label>
             <select 
+              id="provider-select"
               value={provider} 
               onChange={(e) => setProvider(e.target.value)}
               className="input"
@@ -62,8 +63,9 @@ const Settings = () => {
             </select>
           </div>
           <div>
-            <label className="block text-muted mb-2">API Key</label>
+            <label htmlFor="api-key-input" className="block text-muted mb-2">API Key</label>
             <input 
+              id="api-key-input"
               type="password" 
               value={apiKey} 
               onChange={(e) => setApiKey(e.target.value)}

@@ -5,10 +5,10 @@ import os
 
 router = APIRouter()
 
-supabase = create_client(
-    os.getenv("SUPABASE_URL"),
-    os.getenv("SUPABASE_SERVICE_ROLE")
-)
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_SERVICE_ROLE = os.getenv("SUPABASE_SERVICE_ROLE")
+
+supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE) if SUPABASE_URL and SUPABASE_SERVICE_ROLE else None
 
 class ReferralBase(BaseModel):
     source: str
@@ -27,8 +27,10 @@ class Referral(ReferralBase):
 
 @router.get("/", response_model=list[Referral])
 async def list_referrals():
+    if supabase is None:
+        return []
     res = supabase.table("referrals").select("*").execute()
-    return res.data
+    return res.data or []
 
 @router.post("/", response_model=Referral, status_code=201)
 async def create_referral(referral: ReferralCreate):
