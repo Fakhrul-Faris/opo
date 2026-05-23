@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 
 import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
-import Login from './components/Login';
-import Signup from './components/Signup';
+import PinLogin from './components/PinLogin';
+
+
 
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
@@ -71,25 +72,24 @@ const AppLayout = ({ children }) => {
 // Login Route Wrapper so we can use navigate
 const LoginWrapper = () => {
   const navigate = useNavigate();
-  return <Login onSuccess={() => navigate('/dashboard')} />;
+  return <PinLogin onSuccess={() => navigate('/dashboard')} />;
 };
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<LoginWrapper />} />
-        <Route path="/signup" element={<Signup onSuccess={() => {}} />} />
-        
 
-        
-        {/* Protected Routes wrapped in AppLayout */}
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
         <Route
           path="/*"
           element={
             <AppLayout>
               <Routes>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/login" element={<LoginWrapper />} />
+
                 <Route
                   path="/dashboard"
                   element={

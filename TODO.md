@@ -5,6 +5,7 @@
 - [x] Conduct accessibility checks and error handling validation
 - [x] Document final release and project hand-off notes
 
-
+## Current work
+- [x] Disable login/signup routes in the frontend (temporarily)
 
 
