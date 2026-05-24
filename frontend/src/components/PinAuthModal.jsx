@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 const PinAuthModal = ({ onVerify }) => {
   const [pin, setPin] = useState("");

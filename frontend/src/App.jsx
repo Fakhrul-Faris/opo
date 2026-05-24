@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from "react";
 
-import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
-import PinLogin from './components/PinLogin';
+import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from "react-router-dom";
+import PinLogin from "./components/PinLogin";
 
-
-
-import Dashboard from './pages/Dashboard';
+import Dashboard from "./pages/Dashboard";
 import Settings from './pages/Settings';
 import CampaignManager from './pages/CampaignManager';
 import ContentBank from './pages/ContentBank';
@@ -24,7 +22,7 @@ const AppLayout = ({ children }) => {
   const [isLocked, setIsLocked] = useState(false);
   const [timeoutId, setTimeoutId] = useState(null);
 
-  const resetTimer = () => {
+  const resetTimer = useCallback(() => {
     if (isLocked) return;
 
     if (timeoutId) clearTimeout(timeoutId);
@@ -32,38 +30,34 @@ const AppLayout = ({ children }) => {
     // 5 minutes of inactivity locks the session
     const id = setTimeout(() => {
       const token = localStorage.getItem("token");
-      if (token) {
-        setIsLocked(true);
-      }
+      if (token) setIsLocked(true);
     }, 5 * 60 * 1000);
 
     setTimeoutId(id);
-  };
-
+  }, [isLocked, timeoutId]);
 
   useEffect(() => {
-    window.addEventListener('mousemove', resetTimer);
-    window.addEventListener('keydown', resetTimer);
-    window.addEventListener('scroll', resetTimer);
-    window.addEventListener('click', resetTimer);
+    window.addEventListener("mousemove", resetTimer);
+    window.addEventListener("keydown", resetTimer);
+    window.addEventListener("scroll", resetTimer);
+    window.addEventListener("click", resetTimer);
 
-    resetTimer();
+    // Avoid calling a state-updating function synchronously in an effect
+    setTimeout(() => resetTimer(), 0);
 
     return () => {
-      window.removeEventListener('mousemove', resetTimer);
-      window.removeEventListener('keydown', resetTimer);
-      window.removeEventListener('scroll', resetTimer);
-      window.removeEventListener('click', resetTimer);
-      clearTimeout(timeoutId);
+      window.removeEventListener("mousemove", resetTimer);
+      window.removeEventListener("keydown", resetTimer);
+      window.removeEventListener("scroll", resetTimer);
+      window.removeEventListener("click", resetTimer);
+      if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [isLocked]);
+  }, [resetTimer, timeoutId]);
 
   return (
-    <div style={{ display: 'flex' }}>
+    <div style={{ display: "flex" }}>
       <Navigation />
-      <main style={{ marginLeft: '18rem', padding: '2rem', width: '100%' }}>
-        {children}
-      </main>
+      <main style={{ marginLeft: "18rem", padding: "2rem", width: "100%" }}>{children}</main>
       {isLocked && <PinAuthModal onVerify={() => setIsLocked(false)} />}
     </div>
   );

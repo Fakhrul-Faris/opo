@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 
 const PIN_VALUE = "1234";
 
@@ -16,9 +18,6 @@ const PinLogin = ({ onSuccess }) => {
       return;
     }
 
-    // Keep compatibility with existing auth checks.
-    // The backend endpoints still require a Bearer token; for PIN-only demo,
-    // we treat the PIN-auth session as a local token.
     localStorage.setItem("token", "pin-auth-token");
     onSuccess?.();
   };
@@ -31,7 +30,7 @@ const PinLogin = ({ onSuccess }) => {
       {error && <p className="text-red-500 mb-2 text-center">{error}</p>}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
+        <Input
           type="password"
           inputMode="numeric"
           maxLength="4"
@@ -39,10 +38,10 @@ const PinLogin = ({ onSuccess }) => {
           value={pin}
           onChange={(e) => setPin(e.target.value.replace(/[^0-9]/g, ""))}
           required
-          className="input text-center text-2xl tracking-widest"
+          className="text-center text-2xl tracking-widest"
         />
 
-        <button type="submit" className="btn-primary">Login</button>
+        <Button type="submit">Login</Button>
 
         <div className="text-center mt-2 text-sm text-muted">
           Demo PIN: <span className="text-white">1234</span>

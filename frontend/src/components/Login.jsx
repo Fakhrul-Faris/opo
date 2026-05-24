@@ -1,5 +1,8 @@
 // src/components/Login.jsx
-import React, { useState } from "react";
+import { useState } from "react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+
 const Login = ({ onSuccess }) => {
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
@@ -24,7 +27,7 @@ const Login = ({ onSuccess }) => {
       {error && <p className="text-red-500 mb-2 text-center">{error}</p>}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
+        <Input
           type="password"
           inputMode="numeric"
           maxLength="4"
@@ -32,22 +35,21 @@ const Login = ({ onSuccess }) => {
           value={pin}
           onChange={(e) => setPin(e.target.value.replace(/[^0-9]/g, ""))}
           required
-          className="input text-center text-2xl tracking-widest"
+          className="text-center text-2xl tracking-widest"
         />
-        <input
+        <Input
           type="password"
           placeholder="Password"
           value={pin}
           onChange={(e) => setPin(e.target.value.replace(/[^0-9]/g, ""))}
           required
-          className="input text-center"
+          className="text-center"
           style={{ display: "none" }}
         />
-        <button type="submit" className="btn-primary">Login</button>
+        <Button type="submit">Login</Button>
       </form>
     </div>
   );
-
 };
 
 export default Login;

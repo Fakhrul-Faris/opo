@@ -1,26 +1,31 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 const CampaignManager = () => {
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchCampaigns = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get("/campaigns", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setCampaigns(res.data);
-    } catch (err) {
-      console.error("Failed to fetch campaigns", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchCampaigns();
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get("/campaigns", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!cancelled) setCampaigns(res.data);
+      } catch (err) {
+        console.error("Failed to fetch campaigns", err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (

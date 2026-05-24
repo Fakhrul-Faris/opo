@@ -1,26 +1,31 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 const ContentBank = () => {
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchAssets = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get("/content", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setAssets(res.data);
-    } catch (err) {
-      console.error("Failed to fetch content assets", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchAssets();
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get("/content", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!cancelled) setAssets(res.data);
+      } catch (err) {
+        console.error("Failed to fetch content assets", err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (

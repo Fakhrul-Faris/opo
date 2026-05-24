@@ -1,26 +1,31 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 const ReferralTracker = () => {
   const [referrals, setReferrals] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchReferrals = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get("/referrals", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setReferrals(res.data);
-    } catch (err) {
-      console.error("Failed to fetch referrals", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchReferrals();
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get("/referrals", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!cancelled) setReferrals(res.data);
+      } catch (err) {
+        console.error("Failed to fetch referrals", err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (

@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 const AIAgentsHub = () => {
-  const [configuredProvider, setConfiguredProvider] = useState("claude");
   const [settingsLoading, setSettingsLoading] = useState(true);
-  const [agents, setAgents] = useState([
+  const [agents] = useState([
     {
       id: "content-analyzer",
       name: "Content Analyzer",
@@ -44,10 +43,9 @@ const AIAgentsHub = () => {
     const fetchSettings = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("/settings", {
+        await axios.get("/settings", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setConfiguredProvider(res.data.ai_provider || "claude");
       } catch (err) {
         console.error("Failed to load AI settings", err);
       } finally {
@@ -60,13 +58,14 @@ const AIAgentsHub = () => {
 
   const runAgent = async (agentId) => {
     if (!agentInput.trim()) return;
-    
+
     setLoading(true);
     setAgentOutput("");
 
     try {
       const token = localStorage.getItem("token");
       const agent = agents.find((a) => a.id === agentId);
+      if (!agent) return;
 
       const res = await axios.post(
         "/ai/execute",
@@ -81,7 +80,9 @@ const AIAgentsHub = () => {
 
       setAgentOutput(res.data.output);
     } catch (err) {
-      setAgentOutput(`Error: ${err.response?.data?.detail || "Failed to run agent"}`);
+      setAgentOutput(
+        `Error: ${err.response?.data?.detail || "Failed to run agent"}`
+      );
     } finally {
       setLoading(false);
     }
